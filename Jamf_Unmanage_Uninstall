@@ -1,0 +1,32 @@
+USERNAME="ENTER API USERNAME"
+PASSWORD="API PASSWORD"
+JSSURL="https://SERVER.jamfcloud.com"
+
+# Get local serial number
+SERIAL=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}')
+/bin/echo "Serial number is $SERIAL"
+
+# Get JAMF ID of device
+JAMF_ID=$(curl -X GET -s -k -u "$USERNAME:$PASSWORD" "$JSSURL/JSSResource/computers/serialnumber/$SERIAL" | xmllint --xpath '/computer/general/id/text()' -)
+/bin/echo "JAMF ID for $SERIAL is $JAMF_ID"
+
+#Show Device as Unmanaged in JAMF
+curl -X PUT -s -k -u "$USERNAME:$PASSWORD" "$JSSURL/JSSResource/computers/id/$JAMF_ID" -H "Content-Type: application/xml" -H "Accept: application/xml" -d '<computer><general><remote_management><managed>false</managed></remote_management></general></computer>'
+/bin/echo "Unmanaged"	
+
+#now remove MDM Profiles
+sudo jamf removeMdmProfile
+/bin/echo "Removed MDM"
+
+
+#now remove the JAMF Framework
+sudo jamf removeframework
+/bin/echo "Removed Framework"
+
+#now delete script and file
+#FILL IN YOUR PATH HERE IF DIFFERENT
+sudo rm -rf /Library/Application\ Support/JAMF_Removal_SmallMac
+
+/bin/echo "Done."
+
+exit 0
