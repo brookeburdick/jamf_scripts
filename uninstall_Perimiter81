@@ -1,0 +1,54 @@
+#!/bin/bash
+
+######################################################
+## Copyright Brooke Burdick	
+## brooburd@gmail.com
+## September 2023
+## To be used for Jamf admins to delete Perimiter 81
+######################################################
+
+
+setopt interactivecomments
+# terminate Application
+killall Perimeter\ 81
+# stop Daemon
+sudo launchctl unload -w /Library/LaunchDaemons/com.perimeter81d.plist
+# uninstall Daemon
+sudo rm -rf /Library/PrivilegedHelperTools/com.perimeter81d.app /Library/LaunchDaemons/com.perimeter81d.plist /Library/Application\ Support/com.perimeter81d
+# uninstall HT
+sudo rm -rf /Library/PrivilegedHelperTools/com.perimeter81.osx.HelperTool /Library/LaunchDaemons/com.perimeter81.osx.HelperTool.plist
+# unregister Application
+/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -u "/Applications/Perimeter 81.app"
+# uninstall Application
+sudo rm -rf /Applications/Perimeter\ 81.app
+# clear SWG CA
+sudo security delete-certificate -t -c "Perimeter81 Secure Web Gateway 2"
+security find-certificate -c "Perimeter81 Secure Web Gateway 2" -a -Z | sudo awk '/SHA-1/{system("security delete-certificate -Z "$NF)}'
+# clear Logs
+sudo rm -rf /var/log/Perimeter81 ~/Library/Logs/Perimeter81*
+# clear Application User Defaults
+defaults delete com.safervpn.osx.smb
+# clear Daemon User Defaults
+sudo defaults delete com.perimeter81d
+# clear Application keychain
+while security delete-generic-password -s com.safervpn.osx.smb login.keychain; do :; done
+# clear Daemon keychain
+sudo bash -c 'while security delete-generic-password -s com.perimeter81d /Library/Keychains/System.keychain; do :; done'
+# clear helper binaries
+sudo rm -rf /usr/local/bin/wg /usr/local/bin/wg-quick /usr/local/bin/wireguard-go /usr/local/bin/customer_logs.sh /usr/local/bin/osqueryd
+# clear other files and folders for root
+sudo rm -rf "/var/root/Library/Application Support/com.perimeter81d"
+sudo rm -f "/var/root/Library/Preferences/com.perimeter81d.plist"
+sudo rm -rf "/var/root/Library/HTTPStorages/com.perimeter81d"
+sudo rm -f "/var/root/Library/HTTPStorages/com.perimeter81d.binarycookies"
+sudo rm -f "/var/root/Library/snowplow/snowplowEvents-default.sqlite"
+# clear other files and folders for all existing users
+_Users=( `ls /Users | grep -v "Shared"`)
+for TheUser in ${_Users[@]}
+do
+	echo ${TheUser}
+	sudo rm -rf "~/Library/Saved Application State/com.safervpn.osx.smb.savedState"
+	sudo rm -f ~/Library/Preferences/com.safervpn.osx.smb.plist
+	sudo rm -rf ~/Library/HTTPStorages/com.safervpn.osx.smb
+	sudo rm -f ~/Library/LaunchAgents/com.perimeter81.Perimeter81.plist
+done
