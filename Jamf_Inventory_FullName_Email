@@ -1,0 +1,42 @@
+#!/bin/bash
+
+############################################################################
+# Script to prompt users for their first and last names and emails address
+# Then submits this info to jamf computer record (full name, email)
+# Copyright Brooke Burdick brooburd@gmail.com
+# October 2023
+############################################################################
+
+#current user name in case (for custom icons paths)
+currentUser=$( /usr/bin/stat -f "%Su" /dev/console )
+
+#initial info banner
+banner='display dialog "Company needs to update your Mac Inventory Record in Jamf. Please complete the following prompts." with title "Inventory Update Needed" with icon posix file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/UserUnknownIcon.icns"'
+
+/usr/bin/osascript -e "$banner"
+
+#function for prompting users to get variables
+getUserInput()
+{
+	launchctl asuser $(stat -f %u /dev/console) osascript <<-APPLESCRIPT
+	tell app "System Events"
+	text returned of (display dialog "$1" default answer "" buttons {"Cancel", "Submit"} default button 2 cancel button 1)
+	end tell
+	APPLESCRIPT
+}
+
+#prompt for variables
+realName=$(getUserInput "What is your full name? First Last")
+emailAddress=$(getUserInput "What is your full work email address? Example: first.last@enablemedicine.com")
+
+#Send the user's name and email address to the Mac's inventory record. Use double quotes for realName to capture first and last name entered by the user.
+/usr/local/bin/jamf recon -realname "$realName"
+/usr/local/bin/jamf recon -email $emailAddress
+
+#thank you message
+thanks='display dialog "Your computer record has updated." with title "Thank you!" with icon posix file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarFavoritesIcon.icns"'
+/usr/bin/osascript -e "$thanks"
+
+
+
+
