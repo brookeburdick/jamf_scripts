@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#Turn on Firewall
+
+firewall=$(/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate)
+
+echo $firewall. 
+
+echo "Enabling now..."
+
+sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
+
+firewall=$(/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate)
+
+echo $firewall
+echo "Firewall Enabled!"
