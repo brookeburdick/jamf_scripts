@@ -4,7 +4,7 @@
 # Copyright Brooke Burdick
 # October 2023
 # Brooburd@gmail.com
-# This script will ask for a server name, username, password for API user and create a CSV report of any jamf server.
+# This script will ask for a server name, API username, API password and create a CSV report of any jamf server.
 # Extension attributes and other attributes will be edited, hopefully selection will be added.
 # you will need to update the column names and extension attributes to fit your server. You can also add/ remove attributes. 
 ################################
