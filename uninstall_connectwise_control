@@ -1,0 +1,32 @@
+#!/bin/bash
+############################################################################
+# Script to completely remove CW Control, as each app has its own unique string, or thumbprint.
+# Copyright Brooke Burdick brooburd@gmail.com
+# October 2023
+############################################################################
+
+#this grabs the unique thumbprint for each Mac, and then removes screenconnect
+
+thumbprints=$(ls /Library/LaunchAgents/connectwisecontrol-* | awk -F'-' '{print $2}')
+echo $thumbprints
+
+thumbprint=$( echo $thumbprints| awk -F' ' '{print $1}')
+
+echo $thumbprint
+
+#stop process
+launchctl unload /Library/LaunchAgents/connectwisecontrol-$thumbprint-onlogin.plist
+launchctl unload /Library/LaunchDaemons/connectwisecontrol-$thumbprint.plist
+sudo rm -f /Library/LaunchDaemons/connectwisecontrol-$thumbprint.plist
+
+
+#remove processes
+sudo rm -v /Library/LaunchAgents/connectwisecontrol-$thumbprint-*.plist
+
+#finally, delete app
+sudo rm -rv /opt/connectwisecontrol-$thumbprint.app
+sudo rm -rv /Applications/connectwisecontrol-$thumbprint.app
+
+echo "Removed CW Control"
+
+exit 0 
