@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Name: update_warranty.sh
+# Date: Feb 2023
+# Author: Brooke Burdick
+# This script updates computer warranty expiration date based on serial number from a csv file
+# You can obtain this warranty info from Apple support
+# column 1 should be serial number, column 2 should be date in format YYYY-MM-DD
+# file should be .csv format
+# Version: 1.0
+
+
+args=("$@")
+#local link to the warranty info csv file
+file="/Users/itm1test/Desktop/Applecare3.csv"
+#jamf login credentials
+jssname="apiuser"
+jsspass="Welcome2RL"
+jssUrl="https://ridgeline.jamfcloud.com"
+
+#Verify we can read the file
+data=`cat $file`
+if [[ "$data" == "" ]]; then
+	echo "Unable to read the file path specified"
+	echo "Ensure there are no spaces and that the path is correct"
+	exit 1
+fi
+
+#Find how many computers to import and set "recordsNum", which is how many times it will loop
+recordsNum=`awk -F, 'END {printf "%s\n", NR}' $file`
+echo "Number of computers = " $recordsNum
+#Set a counter for the loop, start at 0
+counter="0"
+
+#Loop through the CSV and submit data to the API
+while [ $counter -lt $recordsNum ]
+do
+	counter=$[$counter+1]
+	line=`echo "$data" | head -n $counter | tail -n 1`
+	serialNumber=`echo "$line" | awk -F , '{print $1}'`
+	warrExpires=`echo "$line" | awk -F , '{print $2}'`
+	
+	
+	curl -u $jssname:$jsspass $jssUrl/JSSResource/computers/serialnumber/$serialNumber -H "Content-Type: application/xml" -d "<computer><purchasing><warranty_expires>$warrExpires</warranty_expires></purchasing></computer>" -X PUT
+
+	
+	echo $output
+	echo "******$serialNumber Updated!******"
+	
+done
+
+exit 0
+
