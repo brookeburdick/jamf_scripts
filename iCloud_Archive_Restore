@@ -1,0 +1,13 @@
+#!/bin/bash
+############################################################################
+# Script to move user's Archived folders back into place after disabling iCloud Drive
+# Copyright Brooke Burdick brooburd@gmail.com
+# October 2023
+############################################################################
+
+currentUser=$(defaults read /Library/Preferences/com.apple.loginwindow lastUserName)
+echo $currentUser
+
+cp -r /Users/$currentUser/iCloud\ Drive\ \(Archive\)/Documents/*  /Users/$user/Documents/
+cp -r /Users/$currentUser/iCloud\ Drive\ \(Archive\)/Desktop/*  /Users/$user/Desktop/
+cp -r /Users/$currentUser/iCloud\ Drive\ \(Archive\)/Downloads/*  /Users/$user/Downloads/
