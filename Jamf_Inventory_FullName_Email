@@ -1,17 +1,18 @@
-#!/bin/bash
-
 ############################################################################
-# Script to prompt users for their first and last names and emails address
-# Then submits this info to jamf computer record (full name, email)
-# Copyright Brooke Burdick brooburd@gmail.com
+# Script to prompt users for their first and last names and emails addresses
+# Then submits this info to jamf computer record
+# Use Parameter $4 in Jamf for the company name, $5 for the email example (yourname@company.com)
+# Copyright Brooke Burdick
 # October 2023
 ############################################################################
 
-#current user name in case (for custom icons paths)
+
+#!/bin/bash
+#current user name in case
 currentUser=$( /usr/bin/stat -f "%Su" /dev/console )
 
 #initial info banner
-banner='display dialog "Company needs to update your Mac Inventory Record in Jamf. Please complete the following prompts." with title "Inventory Update Needed" with icon posix file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/UserUnknownIcon.icns"'
+banner='display dialog "$4 needs to update your Mac Inventory Record in Jamf. Please complete the following prompts." with title "Inventory Update Needed" with icon posix file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/UserUnknownIcon.icns"'
 
 /usr/bin/osascript -e "$banner"
 
@@ -27,7 +28,7 @@ getUserInput()
 
 #prompt for variables
 realName=$(getUserInput "What is your full name? First Last")
-emailAddress=$(getUserInput "What is your full work email address? Example: first.last@enablemedicine.com")
+emailAddress=$(getUserInput "What is your full work email address? Example: $5")
 
 #Send the user's name and email address to the Mac's inventory record. Use double quotes for realName to capture first and last name entered by the user.
 /usr/local/bin/jamf recon -realname "$realName"
@@ -36,7 +37,3 @@ emailAddress=$(getUserInput "What is your full work email address? Example: firs
 #thank you message
 thanks='display dialog "Your computer record has updated." with title "Thank you!" with icon posix file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarFavoritesIcon.icns"'
 /usr/bin/osascript -e "$thanks"
-
-
-
-
