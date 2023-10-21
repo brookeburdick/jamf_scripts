@@ -1,4 +1,13 @@
 #!/bin/bash
+################################
+# Copyright Brooke Burdick
+# October 2023
+# Brooburd@gmail.com
+# This script will turn a Macs firewall back on. 
+# it is meant to be ran once daily and scoped to macs with firewall off. 
+# Sometimes the jamf setting is too restrictive and is all/nothing.
+# This allows users to temporarily disable firewall to do whatever they need, then it turns back on once per day. 
+################################
 
 #Turn on Firewall
 
