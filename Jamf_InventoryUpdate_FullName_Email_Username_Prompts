@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ############################################################################
 # Script to prompt users for their first and last names and emails addresses
 # Then submits this info to jamf computer record, along with logged in username as well
@@ -7,7 +9,6 @@
 ############################################################################
 
 
-#!/bin/bash
 #current user name in case
 currentUser=$( /usr/bin/stat -f "%Su" /dev/console )
 companyName=$4
