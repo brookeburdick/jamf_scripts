@@ -1,6 +1,29 @@
-USERNAME="ENTER API USERNAME"
-PASSWORD="API PASSWORD"
-JSSURL="https://SERVER.jamfcloud.com"
+#!/bin/bash
+
+################################
+# Copyright Brooke Burdick
+# October 2023
+# Brooburd@gmail.com
+# This script will ask for a server name, API username, API password. API user account MUST have read/ write permissions.
+# This script will be packaged and then cached locally (jamf waiting room or path of your choice, and will be deleted after. 
+# The point of this script is to make a device show as "unmanaged" before it disconnects from the jamf server so they are easy to identify and search for.
+# then run another script or file process to kick off the script
+################################
+
+#applescript funciton for getting user input
+getUserInput()
+{
+	launchctl asuser $(stat -f %u /dev/console) osascript <<-APPLESCRIPT
+	tell app "System Events"
+	text returned of (display dialog "$1" default answer "" buttons {"OK"} default button 1)
+	end tell
+	APPLESCRIPT
+}
+
+#get the info for the variables
+USERNAME=$(getUserInput "What is the username of the JSS API Account?")
+PASSWORD=(getUserInput "What is the password of the JSS API Account?")
+JSSURL=$(getUserInput "What is the URL of the client Jamf Server? (Must be the FULL name of the jamf URL: https://name.jamfcloud.com"))
 
 # Get local serial number
 SERIAL=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}')
@@ -10,7 +33,8 @@ SERIAL=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}')
 JAMF_ID=$(curl -X GET -s -k -u "$USERNAME:$PASSWORD" "$JSSURL/JSSResource/computers/serialnumber/$SERIAL" | xmllint --xpath '/computer/general/id/text()' -)
 /bin/echo "JAMF ID for $SERIAL is $JAMF_ID"
 
-#Show Device as Unmanaged in JAMF
+#Change device to show Unmanaged in JAMF (this is how we know the script ran since once it is deleted, it no longer checks back in with a success or failure)
+# we can now make searches based on unmanaged devices
 curl -X PUT -s -k -u "$USERNAME:$PASSWORD" "$JSSURL/JSSResource/computers/id/$JAMF_ID" -H "Content-Type: application/xml" -H "Accept: application/xml" -d '<computer><general><remote_management><managed>false</managed></remote_management></general></computer>'
 /bin/echo "Unmanaged"	
 
@@ -18,14 +42,14 @@ curl -X PUT -s -k -u "$USERNAME:$PASSWORD" "$JSSURL/JSSResource/computers/id/$JA
 sudo jamf removeMdmProfile
 /bin/echo "Removed MDM"
 
-
 #now remove the JAMF Framework
 sudo jamf removeframework
 /bin/echo "Removed Framework"
 
-#now delete script and file
+#now delete script from the waiting room
+#if you packaged it in a different locaiton, update the path there
 #FILL IN YOUR PATH HERE IF DIFFERENT
-sudo rm -rf /Library/Application\ Support/JAMF_Removal_SmallMac
+sudo rm -f /Library/Application Support/JAMF/Waiting Room/Jamf_Unmanage_Uninstall.sh
 
 /bin/echo "Done."
 
