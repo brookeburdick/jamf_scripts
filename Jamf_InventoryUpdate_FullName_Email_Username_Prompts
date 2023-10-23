@@ -4,7 +4,6 @@
 # Script to prompt users for their first and last names and emails addresses
 # Then submits this info to jamf computer record, along with logged in username as well
 # Use Parameter $4 in Jamf for the company name, $5 for the email example (yourname@company.com)
-# Users DO NOT have a cancel button, they must continue
 # Copyright Brooke Burdick
 # October 2023
 ############################################################################
