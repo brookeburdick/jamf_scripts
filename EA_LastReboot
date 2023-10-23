@@ -1,0 +1,8 @@
+#!/bin/bash
+# Returns Last Reboot in DATE format
+
+lastReboot=`who -b | awk '{print $3" "$4}'`
+
+echo "<result>"$lastReboot"</result>"
+
+exit 0
