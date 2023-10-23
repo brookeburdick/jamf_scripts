@@ -1,0 +1,10 @@
+#!/bin/bash
+#Responds with CW Control Version or "Not Installed"
+
+if [ -d  "/Applications/connectwisecontrol-"* ]; then
+	connect_wise=$(defaults read /Applications/connectwisecontrol-*.app/Contents/Info.plist CFBundleShortVersionString)
+else
+	connect_wise="Not Installed"
+fi
+
+echo "<result>${connect_wise}</result>"
