@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#get local username
+function get_user {
+	/bin/ls -l /dev/console | /usr/bin/awk '{ print $3 }'
+}
+
+currentuser=$(get_user)
+
+echo $currentuser
+if 
+	[[ -f /Users/$currentuser/Library/Mobile\ Documents ]]; then
+		echo "<result>Drive Enabled</result>"
+else		
+		echo "<result>Drive Disabled</result>"
+fi	
+		
