@@ -1,4 +1,5 @@
 #!/bin/bash
+# Finds if S1 is installed, and if so, whcih version
 
 
 if [ -d  "/Applications/SentinelOne" ]; then
