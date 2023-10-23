@@ -8,15 +8,14 @@
 # October 2023
 ############################################################################
 
-
-#current user name in case
-currentUser=$( /usr/bin/stat -f "%Su" /dev/console )
+#variables from Jamf script $4 for the company name, $5 for the email example (emailprefix@company.com)
 companyName=$4
 emailExample=$5
 
-#initial info banner
+#initial info banner function
 banner='display dialog "'$companyName' needs to update your Mac Inventory Record in Jamf. Please complete the following prompts." with title "Inventory Update Needed" with icon posix file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/UserUnknownIcon.icns"'
 
+#call function to pop-up the Banner
 /usr/bin/osascript -e "$banner"
 
 #function for prompting users to get variables
@@ -24,24 +23,25 @@ getUserInput()
 {
 	launchctl asuser $(stat -f %u /dev/console) osascript <<-APPLESCRIPT
 	tell app "System Events"
-	text returned of (display dialog "$1" default answer "" buttons {"Cancel", "Submit"} default button 2 cancel button 1)
+	text returned of (display dialog "$1" default answer "" buttons {"Submit"} default button 1)
 	end tell
 	APPLESCRIPT
 }
 
-#prompt for variables
+#prompt for name and email
 realName=$(getUserInput "What is your full name? First Last")
 emailAddress=$(getUserInput "What is your full work email address? Example: $emailExample")
 
-# Grab the username of the user that last logged in (current user).
+# Grab the username of the user that last logged in (current user) for the username field
 currentUser=$(defaults read /Library/Preferences/com.apple.loginwindow lastUserName)
 
 #debug checking
 echo $currentUser
 echo $realName
 echo $emailAddress
+echo $currentUser
 
-#Send the user's name and email address to the Mac's inventory record. Use double quotes for realName to capture first and last name entered by the user.
+#Send the user's username, full name and email address to the Mac's inventory record. Use double quotes for realName to capture first and last name entered by the user.
 /usr/local/bin/jamf recon -realname "$realName"
 /usr/local/bin/jamf recon -email $emailAddress
 /usr/local/bin/jamf recon -endUsername $currentUser
@@ -49,5 +49,5 @@ echo $emailAddress
 #thank you message osascript function
 thanks='display dialog "Thank you '$realName'! Your computer inventory record has updated in Jamf." with title "Thank you!" with icon posix file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarFavoritesIcon.icns"'
 
-#call function
+#call thanks function
 /usr/bin/osascript -e "$thanks"
