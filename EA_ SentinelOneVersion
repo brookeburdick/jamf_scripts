@@ -1,0 +1,10 @@
+#!/bin/bash
+
+
+if [ -d  "/Applications/SentinelOne" ]; then
+	sentVersion=$(defaults read /Applications/SentinelOne/SentinelOne\ Extensions.app/Contents/Info.plist CFBundleShortVersionString)
+else
+	sentVersion="Not Installed"
+fi
+
+echo "<result>${sentVersion}</result>"
