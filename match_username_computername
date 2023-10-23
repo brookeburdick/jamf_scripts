@@ -1,26 +1,23 @@
 
 #!/bin/sh
 
-################################################################################
-## Copyright Brooke Burdick	
-## brooburd@gmail.com
-## September 2022
-## Assign Mac to LDAP user
-## To be used for Jamf admins to match a user's local name to match their computer's name
-#################################################################################
+##############################################################################
+# This script renames Macs in Jamf to the currently logged in user's name "-Mac"
+# This is to overrite and Macs with identical names (such as MacBook Pro (1)(2)(3) etc...
+# Brooke Burdick
+# Brooburd@gmail.com
+# October 2023
+##############################################################################
 
-# Grab the username of the user that last logged in (current user).
-
+#get name if last logged in user
 currentUser=`defaults read /Library/Preferences/com.apple.loginwindow lastUserName`
 
-# Submit an inventory report and include the current user (above) to be written to the username field in User and Location Information.
+# Submit an inventory report and include the current user (above) to be written to the username field
+# username field in User and Location Information.
 /usr/local/bin/jamf recon -endUsername $currentUser
 
-# Create a string for computer name
-comp_name="${currentUser}-MBP"
+# Create a string for computer name (username-Mac)
+comp_name="${currentUser}-Mac"
 
 # Rename the Mac using the jamf command line tool
 /usr/local/bin/jamf SetComputername -name "$comp_name"
-
-
-exit 0
