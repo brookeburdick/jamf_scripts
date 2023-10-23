@@ -1,0 +1,48 @@
+
+#!/bin/bash
+#This script was created to collect various mac logs and stats
+#Put in Self Service as part of troubleshooting
+#Saves log file on the end user's Desktop, whcih they can then send you
+# Can be added to for any more info you may want
+#Author: Brooke Burdick Jan 2023
+
+now=$(date)
+
+#get local username
+function get_user {
+	/bin/ls -l /dev/console | /usr/bin/awk '{ print $3 }'
+}
+currentuser=$(get_user)
+echo -e "Username:$currentuser" > /Users/$currentuser/Desktop/maclogs.txt
+echo -e "Time Collected:$now\n" >> /Users/$currentuser/Desktop/maclogs.txt
+
+#basic system info 
+info=$(system_profiler SPSoftwareDataType SPHardwareDataType) 
+echo -e "*** System Info ***\n$info\n" >> /Users/$currentuser/Desktop/maclogs.txt
+
+#get battery health, should be "normal"
+health=$(system_profiler SPPowerDataType | grep -A3 -B7 "Condition")
+echo -e "*** Battery Health ***\n$health\n" >> /Users/$currentuser/Desktop/maclogs.txt
+
+#check HardDrive
+hdCheck=$(diskutil verifyvolume /) 
+echo -e "*** Hard Drive Check ***\n$hdCheck\n" >> /Users/$currentuser/Desktop/maclogs.txt
+
+#powermetrics outputs CPU and other hardware status metrics
+
+sudo /usr/bin/powermetrics -n 1 -s tasks --show-process-io --show-process-energy  --show-plimits --samplers default >> /Users/$currentuser/Desktop/maclogs.txt
+
+#secure token status
+# Get the Username of the currently logged user and secure token status
+loggedInUser=`/bin/ls -l /dev/console | /usr/bin/awk '{ print $3 }'`
+secureTokenStatus=$(dscl . -read /Users/$loggedInUser AuthenticationAuthority | grep -o SecureToken)
+
+if [[ $secureTokenStatus == SecureToken ]]; then
+    echo "***Secure Token Enabled***"
+else
+    echo "***Secure Token Not Enabled***"
+fi
+
+
+
+chown $currentuser /Users/$currentuser/Desktop/maclogs.txt
