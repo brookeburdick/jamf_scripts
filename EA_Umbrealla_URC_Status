@@ -1,0 +1,10 @@
+#!/bin/bash
+#checks if Umbrella Roaming client is installed 
+
+OpenDNS="/Applications/OpenDNS Roaming Client/UmbrellaMenu.app"
+if [ -d "$OpenDNS" ]; then
+	Umbrella_Version=$(defaults read "/Applications/OpenDNS Roaming Client/UmbrellaMenu.app/Contents/Info.plist" CFBundleShortVersionString)
+else
+    Umbrella_Version="Not Installed"
+fi
+echo "<result>${Umbrella_Version}</result>"
