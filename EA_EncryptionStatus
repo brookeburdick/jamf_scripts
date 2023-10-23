@@ -1,0 +1,5 @@
+#!/bin/sh 
+#Responds with a sinmple On. or Off.
+
+	result=`fdesetup status | awk '{print $NF}'`
+	echo "<result>$result</result>" 
