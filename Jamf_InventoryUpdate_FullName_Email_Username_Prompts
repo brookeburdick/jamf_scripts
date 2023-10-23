@@ -4,6 +4,7 @@
 # Script to prompt users for their first and last names and emails addresses
 # Then submits this info to jamf computer record, along with logged in username as well
 # Use Parameter $4 in Jamf for the company name, $5 for the email example (yourname@company.com)
+# Users DO NOT have a cancel button, they must continue
 # Copyright Brooke Burdick
 # October 2023
 ############################################################################
@@ -13,7 +14,7 @@ companyName=$4
 emailExample=$5
 
 #initial info banner function
-banner='display dialog "'$companyName' needs to update your Mac Inventory Record in Jamf. Please complete the following prompts." with title "Inventory Update Needed" with icon posix file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/UserUnknownIcon.icns"'
+banner='display dialog "'$companyName' needs to update your Mac Inventory Record in Jamf. Please complete the following prompts." with title "Inventory Update Needed" with icon posix file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/UserUnknownIcon.icns" buttons {"Continue"} default button 1'
 
 #call function to pop-up the Banner
 /usr/bin/osascript -e "$banner"
@@ -23,10 +24,12 @@ getUserInput()
 {
 	launchctl asuser $(stat -f %u /dev/console) osascript <<-APPLESCRIPT
 	tell app "System Events"
-	text returned of (display dialog "$1" default answer "" buttons {"Submit"} default button 1)
+	text returned of (display dialog "$1" default answer "" buttons {"Continue"} default button 1)
 	end tell
 	APPLESCRIPT
 }
+
+echo getuserinput
 
 #prompt for name and email
 realName=$(getUserInput "What is your full name? First Last")
@@ -47,7 +50,7 @@ echo $currentUser
 /usr/local/bin/jamf recon -endUsername $currentUser
 
 #thank you message osascript function
-thanks='display dialog "Thank you '$realName'! Your computer inventory record has updated in Jamf." with title "Thank you!" with icon posix file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarFavoritesIcon.icns"'
+thanks='display dialog "Thank you '$realName'! Your computer inventory record has updated in Jamf." with title "Thank you!" with icon posix file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/ToolbarFavoritesIcon.icns" buttons {"Continue"} default button 1'
 
 #call thanks function
 /usr/bin/osascript -e "$thanks"
