@@ -1,0 +1,11 @@
+#!/bin/bash
+
+loggedInUser=$(stat -f%Su /dev/console) 
+file=/Users/$loggedInUser/Library/Preferences/MobileMeAccounts.plist
+minimumsize=1000
+actualsize=$(wc -c <"$file")
+if [ $actualsize -ge $minimumsize ]; then
+	echo "<result>iCloud is logged in</result>"
+else
+	echo "<result>iCloud is logged out</result>"
+fi
