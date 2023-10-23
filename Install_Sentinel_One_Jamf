@@ -1,0 +1,76 @@
+#!/bin/bash
+#
+#.SYNOPSIS
+#  Install SentinelOne
+#
+#.NOTES
+#  Name      : installSentinelOne.sh
+#  Revised   : August 2022
+#  Revision  : 1.0
+#  Composer  : Mackenson Emile
+#
+#.LINK
+#  Install / Upgrade SentinelOne using Jamf Pro according to docs
+#  https://usea1-cw01.sentinelone.net/docs/en/installing-and-upgrading-macos-agents-with-jamf.html#installing-and-upgrading-macos-agents-with-jamf
+#
+#.USAGE
+#  sudo installSentinelOne.sh "mountPoint" "computerName" "currentUsername" "pkgName" "pkgVersion" "siteToken"
+#
+#  Examples for arguments:
+#
+#  pkgName="SentinelAgent_macos_v3_4_1_2808.pkg"
+#  pkgVersion="3.4.1.2808"
+#  siteToken="<siteToken>" # Check SentineOne portal for token information.
+#
+#.DESCRIPTION
+#  This script is designed to run alongside a policy in Jamf Pro. To use this
+#  script effectively, cache the instlal package from the policy pkg payload.
+#  This will drop the package in "Waiting Room". Then configure the script to
+#  look for the package name and the package version. This will be used during
+#  the install/upgrade for SentinelOne.
+#----------------------------------------------------------------------
+# Variables
+#----------------------------------------------------------------------
+pkgName=$4
+pkgVersion=$5
+siteToken=$6
+workingDir=/Library/Application\ Support/JAMF/Waiting\ Room
+pkgPath=$workingDir/$pkgName
+echo $pkgName
+echo $pkgVersion
+#echo $siteToken
+echo $workingDir
+echo $pkgPath
+#----------------------------------------------------------------------
+# Main Process
+#----------------------------------------------------------------------
+# This script will check the status of the SentinelOne Agent
+# NOTE: Primary logic is copied from Extension Attribute
+if /usr/bin/command -v sentinelctl 1>/dev/null; then
+    agentVersion=$(sentinelctl version | awk '{print $2}')
+	echo "SentinelOne agent is installed in path `ps aux | grep -E 'sentineld$' | awk '{ print $11 }' | sed 's|sentineld|sentinelctl|g'` with version $agentVersion and was connected to management console `sentinelctl online 2>/dev/null | head -n 1 | awk '{print $2}'` last time at `sentinelctl online 2>/dev/null | sed -n 2p | cut -c 11-`"
+    if [[ $pkgVersion > $agentVersion ]]; then
+        echo "There is a newer version of the agent available; attempting to install..."
+        /usr/local/bin/sentinelctl upgrade-pkg "$pkgPath"
+        echo "Version after install: $(sentinelctl version | awk '{print $2}')"
+    fi
+else
+	s1_agent=$(ps aux | grep -Ei "sentineld$" | awk '{ print $11 };' | grep -v grep)
+	if [[ -z $s1_agent ]]; then
+		echo "SentinelOne agent is not installed; attempting to install..."
+        echo $siteToken > "$workingDir/com.sentinelone.registration-token"
+        /usr/sbin/installer -pkg "$pkgPath" -target /
+	else
+		s1_agent=$(echo $s1_agent | sed 's|sentineld|sentinelctl|g')
+		echo "SentinelOne agent is running but could not locate SentinelCtl in the default PATH /usr/local/bin. The full path is - $s1_agent"
+        ln -s "/Library/Sentinel/sentinel-agent.bundle/Contents/MacOS/sentinelctl" "/usr/local/bin/sentinelctl"
+	fi
+fi
+#----------------------------------------------------------------------
+# Cleanup
+#----------------------------------------------------------------------
+# Removing cached files from the policy pkg payload
+/bin/rm -f "$pkgPath" #PKG File
+/bin/rm -f "$pkgPath.cache.xml" #PKG Config File
+/bin/rm -f "$workingDir/com.sentinelone.registration-token"
+exit 0	
