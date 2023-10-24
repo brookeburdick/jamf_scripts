@@ -1,0 +1,5 @@
+#!/bin/bash
+#uninstalls Qualys Cloud Agent
+
+sudo /Applications/QualysCloudAgent.app/Contents/MacOS/qagent_uninstall.sh
+echo "Qualys Removed!"
