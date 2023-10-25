@@ -14,9 +14,9 @@ args=("$@")
 #local link to the warranty info csv file
 file="/Users/itm1test/Desktop/Applecare3.csv"
 #jamf login credentials
-jssname="apiuser"
-jsspass="Welcome2RL"
-jssUrl="https://ridgeline.jamfcloud.com"
+jssname="
+jsspass="
+jssUrl="
 
 #Verify we can read the file
 data=`cat $file`
