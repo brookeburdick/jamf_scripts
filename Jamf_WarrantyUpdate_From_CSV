@@ -1,9 +1,7 @@
 #!/bin/bash
 
 #updates warranty info from a csv file in jamf MUST be ran locally
-
-# Name: update_warranty.sh
-# Date: 1/31/23
+# Date Created: 1/31/23
 # Updated: 10/11/23
 # Author: Brooke Burdick
 # This script updates computer warranty expiration date based on serial number from a csv file
