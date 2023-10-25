@@ -6,8 +6,8 @@
 # Brooburd@gmail.com
 # This script will ask for a server name, API username, API password. API user account MUST have read/ write permissions.
 # This script will be packaged in Composer and then "installed" to be cached locally (jamf waiting room or path of your choice, and will be deleted after. 
-# The point of this script is to make a device show as "unmanaged" before it disconnects from the jamf server so they are easy to identify and search for.
-# then run another script or file process to kick off the script
+# The point of this script is to make a device show as "unmanaged" before it disconnects from the jamf server so they are easy to identify and search for. If you just send a removeMDM/ removeframework command, the mac still shows in Jamf normally
+# then  you want to run another script via policy to kick off this script
 ################################
 
 #Enter the info for the API calls - this script will be deleted after this is ran for this reason
@@ -30,14 +30,12 @@ curl -X PUT -s -k -u "$USERNAME:$PASSWORD" "$JSSURL/JSSResource/computers/id/$JA
 
 #now remove MDM Profiles
 sudo jamf removeMdmProfile
-/bin/echo "Removed MDM"
 
 #now remove the JAMF Framework
 sudo jamf removeframework
-/bin/echo "Removed Framework"
 
 #now delete script from the waiting room
-#if you packaged it in a different locaiton, update the path there
+#if you packaged it in a different location, update the path there
 #FILL IN YOUR PATH HERE IF DIFFERENT
 sudo rm -f /Library/Application Support/JAMF/Waiting Room/Jamf_Unmanage_Uninstall.sh
 
