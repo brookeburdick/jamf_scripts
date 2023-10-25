@@ -10,7 +10,7 @@
 # then  you want to run another script via policy to kick off this script
 ################################
 
-#Enter the info for the API calls - this script will be deleted after this is ran for this reason
+#Enter the info for the API calls - this script will be deleted after this is ran for this reason - also recommend rotating the password after a successful run
 USERNAME=ENTER YOUR API USERNAME
 PASSWORD=ENTER YOUR API PW
 JSSURL=ENTER YOUR JSS URL
