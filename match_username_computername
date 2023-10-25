@@ -12,8 +12,10 @@
 currentUser=$(id -P $(stat -f%Su /dev/console) | awk -F '[:]' '{print $8}')
 echo $currentUser
 
+model=$(/usr/sbin/system_profiler SPHardwareDataType | grep "Model Name" |  awk -F  ':' '{print $2}')
+
 # Create a string for computer name
-comp_name="${currentUser}'s MacBook Pro"
+comp_name="${currentUser}'s ${model}"
 
 # Rename the Mac using the jamf command line tool
 /usr/local/bin/jamf SetComputername -name "$comp_name"      
