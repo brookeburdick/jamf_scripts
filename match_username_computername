@@ -9,8 +9,7 @@
 ##############################################################################
 
 # Grab the username of the user that last logged in (current user).
-
-currentUser=`defaults read /Library/Preferences/com.apple.loginwindow lastUserName
+currentUser=$(defaults read /Library/Preferences/com.apple.loginwindow lastUserName)
 
 # Create a string for computer name
 comp_name="${currentUser}'s MacBook Pro"
