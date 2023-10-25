@@ -1,21 +1,21 @@
 #!/bin/bash
 
 ##############################################################################
-# This script renames Macs to the currently logged in user's name "-Mac"
+# This script renames Macs to the full name user's macbookpro
 # This is to overrite and Macs with identical names
 # Brooke Burdick
 # Brooburd@gmail.com
 # October 2023
 ##############################################################################
 
-# Grab the username of the user that last logged in (current user).
-currentUser=$(defaults read /Library/Preferences/com.apple.loginwindow lastUserName)
+#Grab the full name of the user
+currentUser=$(id -P $(stat -f%Su /dev/console) | awk -F '[:]' '{print $8}')
+echo $currentUser
 
 # Create a string for computer name
 comp_name="${currentUser}'s MacBook Pro"
 
 # Rename the Mac using the jamf command line tool
-/usr/local/bin/jamf SetComputername -name "$comp_name"
+/usr/local/bin/jamf SetComputername -name "$comp_name"      
 
-
-exit 0
+echo "Renamed to $comp_name"
