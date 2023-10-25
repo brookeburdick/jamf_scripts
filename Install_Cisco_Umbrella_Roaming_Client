@@ -1,0 +1,26 @@
+#!/bin/bash
+##################################
+#Install Umbrella Roaming Client via Jamf
+#Download pkg and then run script
+#Brooke Burdick brooburd@gmail.com
+##4APIFingerprint
+##5APIOrganizationID
+##6APIUserID
+#################################
+
+mkdir -p "/Library/Application Support/OpenDNS Roaming Client/"
+DATA='<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+<key>APIFingerprint</key>
+<string>$4</string>
+<key>APIOrganizationID</key>
+<string>$5</string>
+<key>APIUserID</key>
+<string>$6</string>
+<key>InstallMenubar</key>
+<string><False></string>
+</dict>
+</plist>'
+echo "$DATA" > "/Library/Application Support/OpenDNS Roaming Client/OrgInfo.plist"
