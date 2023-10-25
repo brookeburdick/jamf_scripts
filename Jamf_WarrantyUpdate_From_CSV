@@ -1,7 +1,9 @@
 #!/bin/bash
 
 #updates warranty info from a csv file in jamf MUST be ran locally
-# Date Created: 1/31/23
+
+# Name: update_warranty.sh
+# Date: 1/31/23
 # Updated: 10/11/23
 # Author: Brooke Burdick
 # This script updates computer warranty expiration date based on serial number from a csv file
@@ -32,8 +34,7 @@ jsspass=$(getUserInput "What is the password of the JSS API Account?")
 #Verify we can read the file
 data=`cat $file`
 if [[ "$data" == "" ]]; then
-	echo "Unable to read the file path specified"
-	echo "Ensure there are no spaces and that the path is correct"
+	osascript -e 'display dialog "Unable to read CSV File. Ensure there are no spaces."'
 	exit 1
 fi
 
@@ -59,7 +60,9 @@ do
 	echo $output
 	echo "******$serialNumber Updated!******"
 	
+	
 done
+osascript -e 'display dialog "Process Complete!"'
 
 exit 0
 
