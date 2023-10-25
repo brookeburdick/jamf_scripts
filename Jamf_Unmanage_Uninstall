@@ -10,20 +10,10 @@
 # then run another script or file process to kick off the script
 ################################
 
-#applescript funciton for getting user input
-getUserInput()
-{
-	launchctl asuser $(stat -f %u /dev/console) osascript <<-APPLESCRIPT
-	tell app "System Events"
-	text returned of (display dialog "$1" default answer "" buttons {"OK"} default button 1)
-	end tell
-	APPLESCRIPT
-}
-
-#get the info for the variables
-USERNAME=$(getUserInput "What is the username of the JSS API Account?")
-PASSWORD=(getUserInput "What is the password of the JSS API Account?")
-JSSURL=$(getUserInput "What is the URL of the client Jamf Server? (Must be the FULL name of the jamf URL: https://name.jamfcloud.com"))
+#Enter the info for the API calls - this script will be deleted after this is ran for this reason
+USERNAME=ENTER YOUR API USERNAME
+PASSWORD=ENTER YOUR API PW
+JSSURL=ENTER YOUR JSS URL
 
 # Get local serial number
 SERIAL=$(system_profiler SPHardwareDataType | awk '/Serial/ {print $4}')
