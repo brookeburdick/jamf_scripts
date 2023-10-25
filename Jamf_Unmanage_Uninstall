@@ -5,7 +5,7 @@
 # October 2023
 # Brooburd@gmail.com
 # This script will ask for a server name, API username, API password. API user account MUST have read/ write permissions.
-# This script will be packaged and then cached locally (jamf waiting room or path of your choice, and will be deleted after. 
+# This script will be packaged in Composer and then "installed" to be cached locally (jamf waiting room or path of your choice, and will be deleted after. 
 # The point of this script is to make a device show as "unmanaged" before it disconnects from the jamf server so they are easy to identify and search for.
 # then run another script or file process to kick off the script
 ################################
