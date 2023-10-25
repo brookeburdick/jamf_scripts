@@ -1,0 +1,7 @@
+#!/bin/bash 
+
+sudo /Applications/OpenDNS\ Roaming\ Client/rcuninstall
+
+echo "URC Uninstalled!"
+
+exit 0
