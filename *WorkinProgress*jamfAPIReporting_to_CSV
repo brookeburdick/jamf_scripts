@@ -56,9 +56,9 @@ ids+=($(curl -X GET -s -k -u "$jssUser:$jssPass" "$jssURL/JSSResource/computers"
 #loop through each ID# and get the attributes
 for id in "${ids[@]}"; do
 	echo "Obtaining info of computer with ID: $id"
-	#general query
+
+	#general query string
 	response=$(curl -X GET -s -k -u "$jssUser:$jssPass" "$jssURL/JSSResource/computers/id/$id" )
-	
 	
 	name=$(echo $response | xmllint --xpath '//computer/general/name/text()' - )
 	id=$(echo $response | xmllint --xpath '//computer/general/id/text()' - )
