@@ -5,8 +5,10 @@
 # October 2023
 # Brooburd@gmail.com
 # This script will ask for a server name, API username, API password and create a CSV report of any jamf server.
-# Extension attributes and other attributes will be edited, hopefully selection will be added.
-# you will need to update the column names and extension attributes to fit your server. You can also add/ remove attributes. 
+# Extension attributes and other attributes will be edited by you.
+# you will need to update the column names to fit your server. You can also add/ remove attributes. 
+# You can also leave as-is and try a test run
+# This is VERY useful for MSPs with multiple Jamf Servers to pull reports from, all in one place
 ################################
 
 #applescript funciton for getting user input
@@ -57,8 +59,7 @@ for id in "${ids[@]}"; do
 	#general query
 	response=$(curl -X GET -s -k -u "$jssUser:$jssPass" "$jssURL/JSSResource/computers/id/$id" )
 	
-	#different path for ext attributes
-	extattrpath=$(curl -X GET -s -k -u "$jssUser:$jssPass" "$jssURL/JSSResource/computers/id/$id/subset/ExtensionAttributes")
+	
 	name=$(echo $response | xmllint --xpath '//computer/general/name/text()' - )
 	id=$(echo $response | xmllint --xpath '//computer/general/id/text()' - )
 	serial=$(echo $response | xmllint --xpath '//computer/general/serial_number/text()' - )
@@ -80,7 +81,14 @@ for id in "${ids[@]}"; do
 	#encrypted=$(echo $response | xmllint --xpath '//computer/hardware/storage/disk/disk0/partition/name/Macintosh\ HD\ (Boot Partition)/filevault2_status/text()' - )
 	
 	#extension attributes
+	#different path for ext attributes
+	extattrpath=$(curl -X GET -s -k -u "$jssUser:$jssPass" "$jssURL/JSSResource/computers/id/$id/subset/ExtensionAttributes")
+
 	#####THESE ARE CUSTOM TO EACH SERVER!!!!#####
+	#Example: My EXT Attribute is called "company" (case-sensitive) I would add it here: [name='Company'] 
+	#it also MUST be under the Extension Attrbutes tab
+
+	#EXAMPLES:
 	#latestos=$(echo $extattrpath | xmllint --xpath "//*[name='LatestOSSupported']/value/text()" - )
 	#company=$(echo $extattrpath | xmllint --xpath "//*[name='Company']/value/text()" - )
 	#encrypted=$(echo $extattrpath | xmllint --xpath "//*[name='EncryptionStatus']/value/text()" - )
@@ -90,13 +98,12 @@ for id in "${ids[@]}"; do
 	
 	#user info
 	username=$(echo $response | xmllint --xpath '//computer/location/username/text()' - )
-	
 	email=$(echo $response | xmllint --xpath '//computer/location/email_address/text()' - )
+
 	#error handling	
-	
 	if [[ -n "$name" ]]; then
 		echo "Success; found computer with ID: $id"
-		
+
 		#input data into spreadsheet
 		echo ""$server","$company","$name","$serial","$checkin","$supervised","$depenrolled","$os","$pocessor","$model","$arch","$ip","$batterycap","$speed","$drivecap","$ramcap","$uamdm","$latestos","$encrypted","$username","$email","$activationlock","$iCloudEnabled","$SentinelOneAgentversion"" >> "$outputFile"
 	else
@@ -105,4 +112,4 @@ for id in "${ids[@]}"; do
 	fi
 	
 done
-sleep 10	
+	
