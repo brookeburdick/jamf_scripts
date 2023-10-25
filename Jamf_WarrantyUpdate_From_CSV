@@ -12,7 +12,7 @@
 
 args=("$@")
 #local link to the warranty info csv file
-file="/Users/itm1test/Desktop/Applecare3.csv"
+file="link to file"
 #jamf login credentials
 jssname="
 jsspass="
