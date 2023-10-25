@@ -1,23 +1,22 @@
-
-#!/bin/sh
+#!/bin/bash
 
 ##############################################################################
-# This script renames Macs in Jamf to the currently logged in user's name "-Mac"
-# This is to overrite and Macs with identical names (such as MacBook Pro (1)(2)(3) etc...
+# This script renames Macs to the currently logged in user's name "-Mac"
+# This is to overrite and Macs with identical names
 # Brooke Burdick
 # Brooburd@gmail.com
 # October 2023
 ##############################################################################
 
-#get name if last logged in user
-currentUser=`defaults read /Library/Preferences/com.apple.loginwindow lastUserName`
+# Grab the username of the user that last logged in (current user).
 
-# Submit an inventory report and include the current user (above) to be written to the username field
-# username field in User and Location Information.
-/usr/local/bin/jamf recon -endUsername $currentUser
+currentUser=`defaults read /Library/Preferences/com.apple.loginwindow lastUserName
 
-# Create a string for computer name (username-Mac)
-comp_name="${currentUser}-Mac"
+# Create a string for computer name
+comp_name="${currentUser}'s MacBook Pro"
 
 # Rename the Mac using the jamf command line tool
 /usr/local/bin/jamf SetComputername -name "$comp_name"
+
+
+exit 0
