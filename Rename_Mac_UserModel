@@ -18,6 +18,11 @@ model=$(/usr/sbin/system_profiler SPHardwareDataType | grep "Model Name" |  awk 
 comp_name="${currentUser} ${model}"
 echo $comp_name
 
+#rename locally for good measure
+scutil --set ComputerName $comp_name
+scutil --set HostName $comp_name
+scutil --set LocalHostName $comp_name
+
 # Rename the Mac using the jamf command line tool
 /usr/local/bin/jamf SetComputername -name "$comp_name"      
 
