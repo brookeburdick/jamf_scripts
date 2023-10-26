@@ -1,0 +1,8 @@
+#!/bin/bash
+#Extension attribute returns number of days since last reboot
+
+uptime=$(uptime | awk {'print $3'})
+echo $uptime
+echo "<result>"$uptime"</result>"
+
+exit 0
