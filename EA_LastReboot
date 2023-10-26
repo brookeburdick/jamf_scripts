@@ -1,5 +1,6 @@
-#!/bin/bash
-# Returns Last Reboot in DATE format
+r#!/bin/bash
+# Returns Last Reboot in DATE format - No year
+#Example: October 14
 
 lastReboot=`who -b | awk '{print $3" "$4}'`
 
