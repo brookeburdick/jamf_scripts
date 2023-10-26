@@ -1,4 +1,4 @@
-r#!/bin/bash
+#!/bin/bash
 # Returns Last Reboot in DATE format - No year
 #Example: October 14
 
