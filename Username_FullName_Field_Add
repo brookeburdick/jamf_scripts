@@ -1,0 +1,21 @@
+#!/bin/bash
+
+############################################################################
+# This script fills out the "username" and Full Name tab under Jamf Inventory records based on logged in user
+# Copyright Brooke Burdick
+# October 2023
+############################################################################
+
+# Grab the username of the user that last logged in (current user) for the username field
+username=$(defaults read /Library/Preferences/com.apple.loginwindow lastUserName)
+fullname=$(id -P $(stat -f%Su /dev/console) | awk -F '[:]' '{print $8}')
+echo $fullname
+echo $username
+
+
+#Send the user's username, full name and email address to the Mac's inventory record. Use double quotes for realName to capture first and last name entered by the user.
+/usr/local/bin/jamf recon -endUsername $username
+/usr/local/bin/jamf recon -realName $fullname
+
+exit 0
+
