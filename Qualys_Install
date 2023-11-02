@@ -1,0 +1,11 @@
+#!/bin/bash
+# This Script Installs Qualys Agent Via Jamf
+# Brooke Burdick brooburd@gmail.com
+# October 2023
+# ActivationId=$4 CustomerId=$5 ServerUri=$6
+
+sudo /Applications/QualysCloudAgent.app/Contents/MacOS/qualys-cloud-agent.sh ActivationId=$4 CustomerId=$5 ServerUri=$6
+
+echo "Qualys Installed" 
+
+exit 0
