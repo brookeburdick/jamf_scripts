@@ -1,0 +1,28 @@
+#!/bin/sh
+#Created by Brooke Burdick
+#Feb 2024
+# brooburd@gmail.com
+
+#variables
+
+#app name for the Title and Description field
+app="$4"
+#trigger name is the "custom trigger" name of the policy
+trigger_name="$5"
+#icon to be used in the pop-up (path)
+icon="$6"
+
+current_user=$(/bin/echo "show State:/Users/ConsoleUser" | /usr/sbin/scutil | /usr/bin/awk '/Name :/&&!/loginwindow/{print $3}')
+current_uid=$(id -u "$current_user")
+
+user_response=$("/Library/Application Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper" -windowType utility -windowPostion ur -title "$app Update Available!" -description "$app has an important update available. Please save your work and click to install. You will be notified before $app restarts." -icon $icon -button1 "Install Now" -button2 "Cancel" -defaultButton 1 -cancelButton 2)
+#can add delay options for 10 mins, 1 hour, or 1 day
+#"-showDelayOptions "600, 3600, 86400,..."
+
+echo $user_response 
+
+if [ "$user_response" == "0" ]; then
+    sudo jamf policy -event "$trigger_name"
+else
+    exit 0
+fi
