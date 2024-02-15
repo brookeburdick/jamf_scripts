@@ -10,8 +10,7 @@ currentuser=$(get_user)
 echo $currentuser
 if 
 	[[ -f /Users/$currentuser/Library/Mobile\ Documents ]]; then
-		echo "<result>Drive Enabled</result>"
+		echo "<result>Enabled</result>"
 else		
-		echo "<result>Drive Disabled</result>"
+		echo "<result>Disabled/result>"
 fi	
-		
