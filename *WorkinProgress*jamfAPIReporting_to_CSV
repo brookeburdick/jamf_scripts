@@ -43,7 +43,7 @@ function get_user {
 currentuser=$(get_user)
 echo $currentuser
 
-outputFile=$filePath/JamfReports
+outputFile=$filePath/"JamfReport-$today"
 mkdir $outputFile
 outputFile=$outputFile/$server.csv
 
