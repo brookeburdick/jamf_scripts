@@ -9,7 +9,7 @@
 # you will need to update the column names to fit your server. You can also add/ remove attributes. 
 # You can also leave as-is and try a test run
 # This is VERY useful for MSPs with multiple Jamf Servers to pull reports from, all in one place
-# API user must have at least red (Auditor) access and Basic Authenticaiton allowed in Password settings
+# API user must have at least read (Auditor) access and Basic Authentication allowed in Password settings
 ################################
 
 #applescript funciton for getting user input
