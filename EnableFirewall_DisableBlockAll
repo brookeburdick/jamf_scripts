@@ -1,0 +1,24 @@
+#!/bin/bash
+#This script is used to turn on Firewall for Macs, but keep the "Block all incoming connections" setting OFF. This is useful because with Jamf it is all or nothing. 
+# Brooke Burdick Feb 2024
+# brooburd@gmail.com
+
+#Turn on Firewall
+
+firewall=$(/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate)
+
+echo $firewall. 
+
+echo "Enabling now..."
+
+sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 1
+
+firewall=$(/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate)
+
+echo $firewall
+echo "Firewall Enabled!"
+
+#turn off block all incoming connections
+/usr/libexec/ApplicationFirewall/socketfilterfw --setblockall off
+
+echo "Block all is DISABLED!"
