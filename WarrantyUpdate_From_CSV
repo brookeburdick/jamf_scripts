@@ -3,12 +3,11 @@
 #updates warranty info from a csv file in jamf MUST be ran locally
 
 # Name: update_warranty.sh
-# Date: 1/31/23
 # Updated: 10/11/23
 # Author: Brooke Burdick
 # This script updates computer warranty expiration date based on serial number from a csv file
 # column 1 should be serial number, column 2 should be warranty expiration date in format YYYY-MM-DD
-# Line 1 should not be titles
+# Line 1 should not have headers
 # file should be .csv format
 # API User should have both READ and WRITE permissions
 # Version: 2.0
