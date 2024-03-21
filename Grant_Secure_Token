@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+#enter the admin info below (the admin you need to grant a secure token to) for the server before uploading
+	adminUser="adminuserneedingsecuretoken"
+	adminPass="*******"
+	userName=$(/usr/bin/stat -f%Su /dev/console)
+	
+	## Get the logged in user's password via a prompt
+	echo "Prompting ${userName} for their login password."
+	userPass=$(osascript <<EOD
+	set userPass to text returned of (display dialog "Please Enter your password to enable Parachute Admin Secure Token on your Mac. Your password will not be stored anywhere." with title "Secure Token Required" with icon posix file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/LockedIcon.icns" buttons {"Continue","Later"} default button 1 default answer "" with hidden answer)
+EOD
+)
+
+if [[ $userPass = "" ]]; then
+	echo "no pass provided"
+	exit 0
+else	
+	echo "Adding user to FileVault and Granting SecureToken"
+
+	# Enabling the secure token for the admin account
+	sudo sysadminctl -secureTokenOn $adminUser -password $adminPass -adminUser $managementUser -adminPassword $managementPass
+fi	
+exit 0
