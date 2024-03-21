@@ -5,7 +5,8 @@
 # Brooburd@gmail.com
 # This script will turn a Macs firewall back on. 
 # it is meant to be ran once daily and scoped to macs with firewall off. 
-# Sometimes the jamf setting is too restrictive and is all/nothing.
+# Sometimes the jamf setting is too restrictive and is all/nothing with "block all incoming connections"
+# This does not block all incoming connections, but still enables Firewall.
 # This allows users to temporarily disable firewall to do whatever they need, then it turns back on once per day. 
 ################################
 
