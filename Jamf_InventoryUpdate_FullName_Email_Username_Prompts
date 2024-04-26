@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ############################################################################
-# Script to prompt users for their first and last names and emails addresses
+# Script to prompt users for their first and last name and email address to put in Jamf > User info
 # Then submits this info to jamf computer record, along with logged in username as well
 # Use Parameter $4 in Jamf for the company name, $5 for the email example (yourname@company.com)
-#This allows users to cancel the frist screen, say if they are in a meeting or something and will exit the whole script
-# Copyright Brooke Burdick
+# This allows users to cancel the first screen, say if they are in a meeting or something and will exit the whole script
+# Author: Brooke Burdick
 # October 2023
 ############################################################################
 
