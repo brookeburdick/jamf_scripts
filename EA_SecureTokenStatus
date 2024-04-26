@@ -1,0 +1,4 @@
+#!/bin/bash
+
+tokenStatus=$( sudo profiles status -type bootstraptoken | head -2 | tail -1 | rev | cut -d" " -f1 | rev )
+echo "<result>$tokenStatus</result>"
