@@ -1,0 +1,15 @@
+#!/bin/bash
+#Applicaiton Support
+rm -rf "/Library/Application Support/Antivirus for Mac"
+rm -rf "/Library/Application Support/Bitdefender"
+
+rm -rf "/Library/Bitdefender"
+rm -f "/Library/Extensions/FileProtect.kext"
+rm -f "/Library/Extensions/SelfProtect.kext"
+rm -f "/Library/Extensions/TMProtection.kext"
+#Applications
+rm -rf "/Applications/Antivirus for Mac"
+rm -rf "/Applications/Bitdefender"
+
+echo "removed Bitdefender"
+
