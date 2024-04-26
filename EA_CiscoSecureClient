@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ -d  "/Applications/Cisco/Cisco Secure Client.app" ]; then
+	echo "<result>CiscoSecureClient Installed</result>"
+else
+	echo "<result>CiscoSecureClient Not Installed</result>"
+fi
