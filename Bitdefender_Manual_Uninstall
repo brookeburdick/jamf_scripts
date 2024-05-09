@@ -1,4 +1,7 @@
 #!/bin/bash
+# This is a script to manually remove BitDefender and all relics, from their manual uninstall article.
+# Author: Brooke Burdick May 2024
+
 #Applicaiton Support
 rm -rf "/Library/Application Support/Antivirus for Mac"
 rm -rf "/Library/Application Support/Bitdefender"
