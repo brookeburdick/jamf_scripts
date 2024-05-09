@@ -2,14 +2,16 @@
 # This is a script to manually remove BitDefender and all relics, from their manual uninstall article.
 # Author: Brooke Burdick May 2024
 
-#Applicaiton Support
+#Application Support
 rm -rf "/Library/Application Support/Antivirus for Mac"
 rm -rf "/Library/Application Support/Bitdefender"
 
+#Kernel Extensions
 rm -rf "/Library/Bitdefender"
 rm -f "/Library/Extensions/FileProtect.kext"
 rm -f "/Library/Extensions/SelfProtect.kext"
 rm -f "/Library/Extensions/TMProtection.kext"
+
 #Applications
 rm -rf "/Applications/Antivirus for Mac"
 rm -rf "/Applications/Bitdefender"
