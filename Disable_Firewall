@@ -1,0 +1,19 @@
+#!/bin/bash
+# Script to turn OFF Firewall
+# This allows user to disable firewall, can be used in Self Service as an override
+# Author: Brooke Burdick April 2024
+
+#Turn on Firewall
+
+firewall=$(/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate)
+
+echo $firewall. 
+
+echo "Disabling now..."
+
+sudo defaults write /Library/Preferences/com.apple.alf globalstate -int 0
+
+firewall=$(/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate)
+
+echo $firewall
+echo "Firewall Disabled!"
