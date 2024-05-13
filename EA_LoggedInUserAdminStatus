@@ -1,0 +1,13 @@
+#!/bin/bash
+#EA will report "yes" if the logged in user is admin, and "no" if they are not (lowercase)
+
+#get local username for path
+function get_user {
+	/bin/ls -l /dev/console | /usr/bin/awk '{ print $3 }'
+}
+currentuser=$(get_user)
+echo $currentuser
+
+status=$(dseditgroup -o checkmember -m $currentuser admin | awk '{print $1}')
+
+echo "<result>"$status"</result>"
