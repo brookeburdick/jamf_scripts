@@ -1,0 +1,37 @@
+#!/bin/bash
+#This script will allow standard users to grant secure token to an admin account by promoting them, password prompt, and then demoting them. 
+#Brooke Burdick, May 2024, brooburd@gmail.com
+
+#enter the admin (the user you want to grant secure token) info below for the server before uploading
+adminUser="adminaccount"
+adminPass="adminpassword"
+userName=$(/usr/bin/stat -f%Su /dev/console)
+
+#elevate the logged in user to admin
+echo "elevating to Admin"
+dseditgroup -o edit -a "$userName" -t user admin
+
+
+## Get the logged in user's password via a prompt
+echo "Prompting ${userName} for their login password."
+userPass=$(osascript <<EOD
+	set userPass to text returned of (display dialog "Please Enter your password to enable Parachute Admin Secure Token on your Mac. Your password will not be stored anywhere." with title "Secure Token Required" with icon posix file "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/LockedIcon.icns" buttons {"Continue","Later"} default button 1 default answer "" with hidden answer)
+EOD
+)
+
+if [[ $userPass = "" ]]; then
+	echo "no pass provided"
+	exit 0
+else	
+	echo "Adding user to FileVault and Granting SecureToken"
+	
+	# Enabling the secure token for the admin account
+	sudo sysadminctl -secureTokenOn $adminUser -password $adminPass -adminUser $userName -adminPassword $userPass
+fi	
+
+#demote back to standard
+echo "Demoting back to Standard"
+/usr/sbin/dseditgroup -o edit -d "$userName" -t user admin
+
+exit 0
+
