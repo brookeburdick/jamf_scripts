@@ -12,7 +12,7 @@
 # API user must have at least read (Auditor) access and Basic Authentication allowed in Password settings
 ################################
 
-#applescript funciton for getting user input
+#applescript function for getting user input
 getUserInput()
 {
 	launchctl asuser $(stat -f %u /dev/console) osascript <<-APPLESCRIPT
@@ -22,51 +22,67 @@ getUserInput()
 	APPLESCRIPT
 }
 
-#jssURL=$(getUserInput "What is the full URL of the server?")
-
-server=$(getUserInput "What is the name of the client? (Must be the name in the jamf URL: https://name.jamfcloud.com")
-jssURL="https://$server.jamfcloud.com"
+jssURL=$(getUserInput "What is the full URL of the server?")
+server=$(getUserInput "What is the name of the client?")
+#jssURL="https://$server.jamfcloud.com"
 filePath=$(getUserInput "Where do you wish to save this report? (Make sure to copy the FULL path)")
 jssUser=$(getUserInput "What is the username of the JSS API Account?")
 jssPass=$(getUserInput "What is the password of the JSS API Account?")
 
-#echo $server
-#echo $jssURL
+#Get bearer Token for auth
+authToken=$( /usr/bin/curl \
+--request POST \
+--silent \
+--url "$jssURL/api/v1/auth/token" \
+--user "$jssUser:$jssPass" )
 
-#add headings and overwrite last run or make a new report with today's date
+# parse auth token
+token=$( /usr/bin/plutil \
+-extract token raw - <<< "$authToken" )
 
-today=$(date +”%d-%b-%Y”)
-#get local username for path
-function get_user {
-	/bin/ls -l /dev/console | /usr/bin/awk '{ print $3 }'
-}
-currentuser=$(get_user)
-echo $currentuser
+tokenExpiration=$( /usr/bin/plutil \
+-extract expires raw - <<< "$authToken" )
 
-outputFile=$filePath/"JamfReports
-mkdir $outputFile
-outputFile=$outputFile/$server.csv
+localTokenExpirationEpoch=$( TZ=GMT /bin/date -j \
+-f "%Y-%m-%dT%T" "$tokenExpiration" \
++"%s" 2> /dev/null )
+
+echo Token: "$token"
+echo Expiration: "$tokenExpiration"
+echo Expiration epoch: "$localTokenExpirationEpoch"
+
+# verify auth token is valid
+checkToken=$( /usr/bin/curl \
+--header "Authorization: Bearer $token" \
+--silent \
+--url "$jamfProURL/api/v1/auth" \
+--write-out "%{http_code}" )
+
+tokenStatus=${checkToken: -3}
+echo Token status: "$tokenStatus"
 
 #Populate CSV with column names
-echo "Server,Company,Name,Serial_Number,Last_Checkin,Supervised?,Enrolled_via_DEP?,OS_Version,Processor_Type,Model,Architecture,IP_Address,Battery_Capacity,Processor_Speed,Drive _Capacity,RAM_MB,User_Approved_MDM,Latest_Os_Supported,Encrypted,UserName,Email,ActivationLocked,iCloudAccount,S1Version" > "$outputFile"
+echo "Server,Company,Name,Serial_Number,Last_Checkin,Enrollment_Date,Supervised?,Enrolled_via_DEP?,OS_Version,Processor_Type,Model,Architecture,IP_Address,Intel Only-Battery_Capacity,Intel Only-Processor_Speed,Drive _Capacity,RAM_MB,User_Approved_MDM,Encrypted,UserName,Email,ActivationLocked" > "$outputFile"
 
 #Get IDs that exist
 echo "Downloading list of computer IDs..."
-ids+=($(curl -X GET -s -k -u "$jssUser:$jssPass" "$jssURL/JSSResource/computers" | xmllint --format - | awk -F'>|<' '/<id>/{print $3}' | sort -n))
+ids+=($(curl -X GET -s -H "Authorization: Bearer $token" --url "$jssURL/JSSResource/computers" -H "Accept: text/xml" | xmllint --format - | awk -F'>|<' '/<id>/{print $3}' | sort -n))
 
 #loop through each ID# and get the attributes
 for id in "${ids[@]}"; do
 	echo "Obtaining info of computer with ID: $id"
-
-	#general query string
-	response=$(curl -X GET -s -k -u "$jssUser:$jssPass" "$jssURL/JSSResource/computers/id/$id" )
+	#general query
+	response=$(curl -X GET -s -H "Authorization: Bearer $token" --url "$jssURL/JSSResource/computers/id/$id" -H "Accept: text/xml")
 	
+	#different path for ext attributes
+	extattrpath=$(curl -X GET -s -H "Authorization: Bearer $token" --url "$jssURL/JSSResource/computers/id/$id/subset/ExtensionAttributes" -H "Accept: text/xml")
 	name=$(echo $response | xmllint --xpath '//computer/general/name/text()' - )
 	id=$(echo $response | xmllint --xpath '//computer/general/id/text()' - )
 	serial=$(echo $response | xmllint --xpath '//computer/general/serial_number/text()' - )
 	supervised=$(echo $response | xmllint --xpath '//computer/general/supervised/text()' - )
 	ip=$(echo $response | xmllint --xpath '//computer/general/ip_address/text()' - )
-	checkin=$(echo $response | xmllint --xpath '//computer/general/last_contact_time/text()' - )
+	checkin=$(echo $response | xmllint --xpath '//computer/general/last_contact_time/text()' - | awk '{print $1}')
+	enrollment=$(echo $response | xmllint --xpath '//computer/general/initial_entry_date/text()' - )
 	arch=$(echo $response | xmllint --xpath '//computer/hardware/processor_architecture/text()' - )
 	batterycap=$(echo $response | xmllint --xpath '//computer/hardware/battery_capacity/text()' - )
 	os=$(echo $response | xmllint --xpath '//computer/hardware/os_version/text()' - )
@@ -82,35 +98,24 @@ for id in "${ids[@]}"; do
 	#encrypted=$(echo $response | xmllint --xpath '//computer/hardware/storage/disk/disk0/partition/name/Macintosh\ HD\ (Boot Partition)/filevault2_status/text()' - )
 	
 	#extension attributes
-	#different path for ext attributes
-	extattrpath=$(curl -X GET -s -k -u "$jssUser:$jssPass" "$jssURL/JSSResource/computers/id/$id/subset/ExtensionAttributes")
-
-	#####THESE ARE CUSTOM TO EACH SERVER!!!!#####
-	#Example: My EXT Attribute is called "company" (case-sensitive) I would add it here: [name='Company'] 
-	#it also MUST be under the Extension Attrbutes tab
-
-	#EXAMPLES:
+	#these will be unique, but here is an example, replace the extension attribute name in the path
 	#latestos=$(echo $extattrpath | xmllint --xpath "//*[name='LatestOSSupported']/value/text()" - )
-	#company=$(echo $extattrpath | xmllint --xpath "//*[name='Company']/value/text()" - )
-	#encrypted=$(echo $extattrpath | xmllint --xpath "//*[name='EncryptionStatus']/value/text()" - )
-	#iCloudEnabled=$(echo $extattrpath | xmllint --xpath "//*[name='iCloud Account Status']/value/text()" - )
-	#iCloudDrive=$(echo $extattrpath | xmllint --xpath "//*[name='iCloud Drive Status']/value/text()" - )
-	#SentinelOneAgentversion=$(echo $extattrpath | xmllint --xpath "//*[name='Sentinel One Version']/value/text()" - )
+
 	
 	#user info
 	username=$(echo $response | xmllint --xpath '//computer/location/username/text()' - )
+	fullName=$(echo $response | xmllint --xpath '//computer/location/fullname/text()' - )
 	email=$(echo $response | xmllint --xpath '//computer/location/email_address/text()' - )
-
 	#error handling	
+	
 	if [[ -n "$name" ]]; then
 		echo "Success; found computer with ID: $id"
-
+		
 		#input data into spreadsheet
-		echo ""$server","$company","$name","$serial","$checkin","$supervised","$depenrolled","$os","$pocessor","$model","$arch","$ip","$batterycap","$speed","$drivecap","$ramcap","$uamdm","$latestos","$encrypted","$username","$email","$activationlock","$iCloudEnabled","$SentinelOneAgentversion"" >> "$outputFile"
+		echo ""$server","$company","$name","$serial","$checkin","$enrollment","$supervised","$depenrolled","$os","$processor","$model","$arch","$ip","$batterycap","$speed","$drivecap","$ramcap","$uamdm","$encrypted","$username","$email","$activationlock""" >> "$outputFile"
 	else
 		echo "Error; can't GET name of computer with ID: $id"
 		sleep 1
 	fi
 	
-done
-	
+done		
